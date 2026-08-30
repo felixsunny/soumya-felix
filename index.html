@@ -17,7 +17,10 @@
 <meta property="og:title" content="The engagement of Soumya &amp; Felix" />
 <meta property="og:description" content="Sunday, 4 October 2026 · Holy Mass at St. Paul's Church, Morar, 6:00 PM · Reception at Riti Riwaz." />
 <meta property="og:image" content="https://felixsunny.github.io/soumya-felix/preview.jpg" />
-     <meta property="og:image:secure_url" content="https://felixsunny.github.io/soumya-felix/preview.jpg" />
+<meta property="og:image:secure_url" content="https://felixsunny.github.io/soumya-felix/preview.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:url" content="https://felixsunny.github.io/soumya-felix/" />
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="The engagement of Soumya &amp; Felix" />
@@ -105,8 +108,16 @@ body::before{
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/><feColorMatrix type='saturate' values='0'/></filter><rect width='180' height='180' filter='url(%23n)'/></svg>");
 }
 
-/* ═══ FIREFLIES + HAZE ═══ */
-#fireflies{ position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+/* ═══ FIREFLIES + HAZE ═══
+   The canvas sits ABOVE the card, not behind it. On a phone the
+   card fills the viewport, so a canvas underneath is invisible.
+   Screen blending lets the glow sit over the navy without
+   washing out the type; pointer-events:none keeps links live. */
+#fireflies{
+  position:fixed; inset:0; width:100%; height:100%;
+  z-index:6; pointer-events:none;
+  mix-blend-mode:screen;
+}
 .haze{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
 .bloom{ position:absolute; border-radius:50%; filter:blur(80px); }
 .bloom--1{
@@ -873,12 +884,15 @@ body.is-open .card{ opacity:1; transform:none; }
       w = window.innerWidth; h = window.innerHeight;
       cvs.width = w*dpr; cvs.height = h*dpr;
       ctx.setTransform(dpr,0,0,dpr,0,0);
-      var n = Math.round(Math.min(w,900)/26);
+      /* Narrow screens get a denser field: the card covers most
+         of the viewport, so a desktop-rate count reads as empty. */
+      var narrow = w < 620;
+      var n = Math.max(narrow ? 26 : 18, Math.round(Math.min(w,900) / (narrow ? 14 : 26)));
       flies = [];
       for(var i=0;i<n;i++){
         flies.push({
           x:Math.random()*w, y:Math.random()*h,
-          r:1.1 + Math.random()*2.1,
+          r:(narrow ? 1.4 : 1.1) + Math.random()*(narrow ? 2.6 : 2.1),
           sx:0.10 + Math.random()*0.30,      /* wander speeds  */
           sy:0.08 + Math.random()*0.24,
           px:Math.random()*Math.PI*2,
